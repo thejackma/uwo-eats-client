@@ -6,6 +6,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -24,7 +25,7 @@ export default function Home() {
   const store = data.store;
 
   const categories = store.categories.map((category) =>
-    <Category category={category}></Category>
+    <Category category={category} />
   );
 
   return (
@@ -48,7 +49,7 @@ function Category(props) {
   const category = props.category;
 
   const items = category.items.map((item) =>
-    <Item item={item}></Item>
+    <Item item={item} />
   );
 
   return (
@@ -63,6 +64,7 @@ function Category(props) {
 
 function Item(props) {
   const item = props.item;
+  const [quantity, setQuantity] = useState(0);
 
   return (
     <Grid item xs={4}>
@@ -71,9 +73,14 @@ function Item(props) {
           <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
           <Typography variant="body2">${item.price.toFixed(2)}</Typography>
         </CardContent>
-        <CardActions sx={{ pt: 0 }}>
-          <IconButton sx={{ ml: 'auto' }}><RemoveIcon /></IconButton>
-          <IconButton sx={{ ml: 'auto' }}><AddIcon /></IconButton>
+        <CardActions sx={{ pt: 0, justifyContent: 'flex-end' }}>
+          {quantity > 0 &&
+            <IconButton onClick={() => setQuantity(quantity - 1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
+          }
+          {quantity > 0 &&
+            <Typography fontWeight="medium" mx={1}>{quantity}</Typography>
+          }
+          <IconButton onClick={() => setQuantity(quantity + 1)}><AddIcon /></IconButton>
         </CardActions>
       </Card>
     </Grid>
