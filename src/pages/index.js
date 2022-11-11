@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import Head from 'next/head'
 import useSWR from 'swr'
 
@@ -22,31 +23,9 @@ export default function Home() {
 
   const store = data.store;
 
-  const categories = store.categories.map((category) => {
-    const items = category.items.map((item) =>
-      <Grid item xs={4}>
-        <Card sx={{ minWidth: 275 }}>
-          <CardContent sx={{ pb: 0 }}>
-            <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
-            <Typography variant="body2">${item.price.toFixed(2)}</Typography>
-          </CardContent>
-          <CardActions sx={{ pt: 0 }}>
-            <IconButton sx={{ ml: 'auto' }}><RemoveIcon /></IconButton>
-            <IconButton sx={{ ml: 'auto' }}><AddIcon /></IconButton>
-          </CardActions>
-        </Card>
-      </Grid>
-    );
-
-    return (
-      <div>
-        <Typography variant="h6" mb={2}>{category.name}</Typography>
-        <Grid container rowSpacing={2} columnSpacing={2} mb={2}>
-          {items}
-        </Grid>
-      </div>
-    );
-  });
+  const categories = store.categories.map((category) =>
+    <Category category={category}></Category>
+  );
 
   return (
     <div>
@@ -62,5 +41,41 @@ export default function Home() {
         {categories}
       </main>
     </div>
+  );
+}
+
+function Category(props) {
+  const category = props.category;
+
+  const items = category.items.map((item) =>
+    <Item item={item}></Item>
+  );
+
+  return (
+    <div>
+      <Typography variant="h6" mb={2}>{category.name}</Typography>
+      <Grid container rowSpacing={2} columnSpacing={2} mb={2}>
+        {items}
+      </Grid>
+    </div>
+  );
+}
+
+function Item(props) {
+  const item = props.item;
+
+  return (
+    <Grid item xs={4}>
+      <Card sx={{ minWidth: 275 }}>
+        <CardContent sx={{ pb: 0 }}>
+          <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
+          <Typography variant="body2">${item.price.toFixed(2)}</Typography>
+        </CardContent>
+        <CardActions sx={{ pt: 0 }}>
+          <IconButton sx={{ ml: 'auto' }}><RemoveIcon /></IconButton>
+          <IconButton sx={{ ml: 'auto' }}><AddIcon /></IconButton>
+        </CardActions>
+      </Card>
+    </Grid>
   );
 }
