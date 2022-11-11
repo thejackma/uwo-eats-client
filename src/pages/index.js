@@ -54,7 +54,7 @@ function Category(props) {
   return (
     <div>
       <Typography variant="h6" mb={2}>{category.name}</Typography>
-      <Grid container rowSpacing={2} columnSpacing={2} mb={2}>
+      <Grid container rowSpacing={2} columnSpacing={2} mb={3}>
         {items}
       </Grid>
     </div>
