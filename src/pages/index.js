@@ -71,7 +71,7 @@ function Category(props) {
   return (
     <div>
       <Typography variant="h6" mb={2}>{category.name}</Typography>
-      <Grid container rowSpacing={2} columnSpacing={2} mb={3}>
+      <Grid container spacing={2} mb={3}>
         {items}
       </Grid>
     </div>
@@ -88,8 +88,8 @@ function Item(props) {
   }
 
   return (
-    <Grid item xs={4}>
-      <Card sx={{ minWidth: 275 }}>
+    <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
+      <Card>
         <CardContent sx={{ pb: 0 }}>
           <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
           <Typography variant="body2">${item.price.toFixed(2)}</Typography>
