@@ -26,9 +26,8 @@ export default function Home() {
   if (!data) return <div>Loading...</div>
 
   const store = data.store;
-  const totalQuantity = Object.values(cart).reduce((sum, x) => sum + x, 0);
 
-  function onQuantityChange(name, delta) {
+  function updateCart(name, delta) {
     const newCart = {
       ...cart,
       [name]: (cart[name] ?? 0) + delta,
@@ -40,7 +39,7 @@ export default function Home() {
   }
 
   const categories = store.categories.map((category) =>
-    <Category key={category.name} category={category} onQuantityChange={onQuantityChange} />
+    <Category key={category.name} category={category} onQuantityChange={updateCart} />
   );
 
   return (
@@ -57,12 +56,7 @@ export default function Home() {
         {categories}
       </main>
 
-      {totalQuantity > 0 &&
-        <Fab variant="extended" sx={{ position: 'fixed', bottom: 32, right: 40 }}>
-          <ShoppingCartIcon sx={{ mr: 1 }} />
-          Cart • {totalQuantity}
-        </Fab>
-      }
+      <Cart cart={cart} />
     </div>
   );
 }
@@ -112,4 +106,17 @@ function Item(props) {
       </Card>
     </Grid>
   );
+}
+
+function Cart(props) {
+  const totalQuantity = Object.values(props.cart).reduce((sum, x) => sum + x, 0);
+
+  if (totalQuantity > 0) {
+    return (
+      <Fab variant="extended" sx={{ position: 'fixed', bottom: 32, right: 40 }}>
+        <ShoppingCartIcon sx={{ mr: 1 }} />
+        Cart • {totalQuantity}
+      </Fab>
+    );
+  }
 }
