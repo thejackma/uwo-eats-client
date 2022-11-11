@@ -7,9 +7,11 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Fab from '@mui/material/Fab';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import RemoveIcon from '@mui/icons-material/Remove';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Typography from '@mui/material/Typography';
 
 import { apiRoot } from '../config';
@@ -17,15 +19,28 @@ import { apiRoot } from '../config';
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 export default function Home() {
+  const [cart, setCart] = useState({});
   const { data, error } = useSWR(apiRoot + '/store/1', fetcher);
 
   if (error) return <div>Failed to load</div>
   if (!data) return <div>Loading...</div>
 
   const store = data.store;
+  const totalQuantity = Object.values(cart).reduce((sum, x) => sum + x, 0);
+
+  function onQuantityChange(name, delta) {
+    const newCart = {
+      ...cart,
+      [name]: (cart[name] ?? 0) + delta,
+    };
+    if (newCart[name] <= 0) {
+      delete newCart[name];
+    }
+    setCart(newCart);
+  }
 
   const categories = store.categories.map((category) =>
-    <Category category={category} />
+    <Category key={category.name} category={category} onQuantityChange={onQuantityChange} />
   );
 
   return (
@@ -41,6 +56,13 @@ export default function Home() {
         <Typography variant="body2" mb={4}>{store.address}</Typography>
         {categories}
       </main>
+
+      {totalQuantity > 0 &&
+        <Fab variant="extended" sx={{ position: 'fixed', bottom: 32, right: 40 }}>
+          <ShoppingCartIcon sx={{ mr: 1 }} />
+          Cart • {totalQuantity}
+        </Fab>
+      }
     </div>
   );
 }
@@ -48,8 +70,8 @@ export default function Home() {
 function Category(props) {
   const category = props.category;
 
-  const items = category.items.map((item) =>
-    <Item item={item} />
+  const items = props.category.items.map((item) =>
+    <Item key={item.name} item={item} onQuantityChange={props.onQuantityChange} />
   );
 
   return (
@@ -66,6 +88,11 @@ function Item(props) {
   const item = props.item;
   const [quantity, setQuantity] = useState(0);
 
+  function updateQuantity(delta) {
+    setQuantity(quantity + delta);
+    props.onQuantityChange(item.name, delta);
+  }
+
   return (
     <Grid item xs={4}>
       <Card sx={{ minWidth: 275 }}>
@@ -75,12 +102,12 @@ function Item(props) {
         </CardContent>
         <CardActions sx={{ pt: 0, justifyContent: 'flex-end' }}>
           {quantity > 0 &&
-            <IconButton onClick={() => setQuantity(quantity - 1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
+            <IconButton onClick={() => updateQuantity(-1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
           }
           {quantity > 0 &&
             <Typography fontWeight="medium" mx={1}>{quantity}</Typography>
           }
-          <IconButton onClick={() => setQuantity(quantity + 1)}><AddIcon /></IconButton>
+          <IconButton onClick={() => updateQuantity(1)}><AddIcon /></IconButton>
         </CardActions>
       </Card>
     </Grid>
