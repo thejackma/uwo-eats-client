@@ -5,6 +5,7 @@ import useSWR from 'swr';
 
 import AddIcon from '@mui/icons-material/Add';
 import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -110,9 +111,15 @@ function Item(props) {
       <Card>
         <CardContent sx={{ pb: 0 }}>
           <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
-          <Typography variant="body2">${item.price.toFixed(2)}</Typography>
+          <Box sx={{ display: 'flex' }}>
+            <Typography variant="body2">${item.price.toFixed(2)}</Typography>
+            <Typography sx={{ flex: 1 }}></Typography>
+            {quantity > 0 &&
+              <Typography variant="body2">${(item.price * quantity).toFixed(2)}</Typography>
+            }
+          </Box>
         </CardContent>
-        <CardActions sx={{ pt: 0 }} disableSpacing>
+        <CardActions disableSpacing>
           <Typography sx={{ flex: 1 }}></Typography>
           {quantity > 0 &&
             <IconButton onClick={() => onQuantityChange(-1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
@@ -154,23 +161,25 @@ function Cart(props) {
 }
 
 function CartPage(props) {
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-  const filteredCategories = props.store.categories
+  const categoriesInCart = props.store.categories
     .map(category => ({ ...category, items: category.items.filter(item => props.cart.hasOwnProperty(item.id)) }))
     .filter(category => category.items.length > 0);
 
-  const categories = filteredCategories.map(category =>
+  const categories = categoriesInCart.map(category =>
     <Category key={category.name} category={category} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={false} />
   );
+
+  const totalPrice = categoriesInCart.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.id], 0), 0);
+
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <Dialog fullScreen={fullScreen} fullWidth={true} open={props.open} onClose={props.onClose}>
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={props.onClose}><CloseIcon /></IconButton>
-          <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+          <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
           </Typography>
           <Button autoFocus color="inherit" onClick={props.onClose}>
             Submit
@@ -179,6 +188,11 @@ function CartPage(props) {
       </AppBar>
       <DialogContent>
         {categories}
+        <Box sx={{ display: 'flex' }}>
+          <Typography variant="h6" mb={2}>Total</Typography>
+          <Typography sx={{ flex: 1 }}></Typography>
+          <Typography variant="h6">${totalPrice.toFixed(2)}</Typography>
+        </Box>
       </DialogContent>
     </Dialog>
   );

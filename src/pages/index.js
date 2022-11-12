@@ -24,7 +24,7 @@ export default function Home() {
             <Card>
               <CardActionArea onClick={() => router.push('/store/1')}>
                 <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">Middlesex Sushi</Typography>
+                  <Typography gutterBottom variant="h5">Middlesex Sushi</Typography>
                   <Typography variant="body2" color="text.secondary">
                     Using the finest quality fish in the world, our master sushi chefs craft a memorable and delicious meal using traditional edomae techniques.
                   </Typography>
