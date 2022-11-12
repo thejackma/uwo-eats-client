@@ -24,7 +24,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
-import { apiRoot } from '../../config';
+import { apiRoot } from '../../../config';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
