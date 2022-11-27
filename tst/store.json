@@ -1,0 +1,137 @@
+{
+    "storeId": 1,
+    "address": "1151 Richmond St, London, ON N6A 3K7, Canada",
+    "items": {
+        "1": {
+            "category": "Teriyaki",
+            "name": "Chicken Teriyaki",
+            "price": 11
+        },
+        "2": {
+            "category": "Teriyaki",
+            "name": "Beef Teriyaki",
+            "price": 11
+        },
+        "3": {
+            "category": "Teriyaki",
+            "name": "Shrimp Teriyaki",
+            "price": 11
+        },
+        "4": {
+            "category": "Teriyaki",
+            "name": "Salmon Teriyaki",
+            "price": 12
+        },
+        "5": {
+            "category": "Bento Box",
+            "name": "Chicken Bento",
+            "price": 12
+        },
+        "6": {
+            "category": "Bento Box",
+            "name": "Beef Bento",
+            "price": 13
+        },
+        "7": {
+            "category": "Bento Box",
+            "name": "Shrimp Bento",
+            "price": 13
+        },
+        "8": {
+            "category": "Bento Box",
+            "name": "Salmon Bento",
+            "price": 14
+        },
+        "9": {
+            "category": "Sushi",
+            "name": "Eel (Unagi) Sushi",
+            "price": 5
+        },
+        "10": {
+            "category": "Sushi",
+            "name": "Salmon (Sake) Sushi",
+            "price": 4
+        },
+        "11": {
+            "category": "Sushi",
+            "name": "Tuna (Maguro) Sushi",
+            "price": 5
+        },
+        "12": {
+            "category": "Sushi",
+            "name": "White Tuna (Albacore) Sushi",
+            "price": 4
+        },
+        "13": {
+            "category": "Sushi",
+            "name": "Fluke (Hirame) Sushi",
+            "price": 4
+        },
+        "14": {
+            "category": "Sushi",
+            "name": "Stripe Bass (Suzuki) Sushi",
+            "price": 4
+        },
+        "15": {
+            "category": "Sushi",
+            "name": "Yellowtail (Hamachi) Sushi",
+            "price": 5
+        },
+        "16": {
+            "category": "Sushi",
+            "name": "Scallop (Hotate) Sushi",
+            "price": 4
+        },
+        "17": {
+            "category": "Sushi",
+            "name": "Sweet Shrimp (Amaebi) Sushi",
+            "price": 6
+        },
+        "18": {
+            "category": "Sushi",
+            "name": "Cooked Shrimp (Ebi) Sushi",
+            "price": 4
+        },
+        "19": {
+            "category": "Sushi",
+            "name": "Squid (Ika) Sushi",
+            "price": 4
+        },
+        "20": {
+            "category": "Sushi",
+            "name": "Octopus (Tako) Sushi",
+            "price": 4
+        },
+        "21": {
+            "category": "Sushi",
+            "name": "Crab Stick (Kani) Sushi",
+            "price": 3
+        },
+        "22": {
+            "category": "Sushi",
+            "name": "Egg Custard (Tomago) Sushi",
+            "price": 3
+        },
+        "23": {
+            "category": "Sushi",
+            "name": "Sea Urchin (Uni) Sushi",
+            "price": 8
+        },
+        "24": {
+            "category": "Sushi",
+            "name": "Salmon Roe (Ikura) Sushi",
+            "price": 6
+        },
+        "25": {
+            "category": "Sushi",
+            "name": "Flying Roe (Tobiko) Sushi",
+            "price": 5
+        },
+        "26": {
+            "category": "Party",
+            "name": "Party Tray",
+            "price": 25
+        }
+    },
+    "name": "Middlesex Sushi"
+}

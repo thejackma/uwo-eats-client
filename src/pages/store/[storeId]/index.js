@@ -4,21 +4,14 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
-import AddIcon from '@mui/icons-material/Add';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import Fab from '@mui/material/Fab';
-import Grid from '@mui/material/Unstable_Grid2';
 import IconButton from '@mui/material/IconButton';
-import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -28,20 +21,21 @@ import { useTheme } from '@mui/material/styles';
 import _ from 'lodash';
 
 import { apiRoot } from '../../../config';
+import Category from '../../../widgets/category';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 export default function Store() {
   const [cart, setCart] = useState({});
   const router = useRouter();
-  const { data, error } = useSWR(apiRoot + '/store/' + router.query.id, fetcher);
+  const { data, error } = useSWR(`${apiRoot}/store/${router.query.storeId}`, fetcher);
 
   if (error) return <div>Failed to load</div>
   if (!data) return <div>Loading...</div>
 
   const store = data.store;
 
-  _(store.items).each((item, id) => item.id = id);
+  _(store.items).each((item, itemId) => item.itemId = itemId);
 
   store.categories = groupItemsByCategory(store.items);
 
@@ -87,68 +81,6 @@ function groupItemsByCategory(items) {
     .value();
 }
 
-function Category(props) {
-  const category = props.category;
-
-  const items = category.items.map(item =>
-    <Item key={item.name} item={item} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={props.grid} />
-  );
-
-  return (
-    <div>
-      <Typography variant="h6" mb={2}>{category.name}</Typography>
-      <Grid container spacing={2} mb={3}>
-        {items}
-      </Grid>
-    </div>
-  );
-}
-
-function Item(props) {
-  const item = props.item;
-  const quantity = props.cart[item.id] ?? 0;
-
-  function onQuantityChange(delta) {
-    props.onQuantityChange(item.id, delta);
-  }
-
-  const grid = props.grid;
-  const columns = {
-    xs: 12,
-    sm: grid ? 6 : 12,
-    md: grid ? 4 : 12,
-    lg: grid ? 3 : 12,
-    xl: grid ? 2 : 12,
-  };
-
-  return (
-    <Grid {...columns}>
-      <Card>
-        <CardContent sx={{ pb: 0 }}>
-          <Typography gutterBottom fontWeight="medium">{item.name}</Typography>
-          <Box sx={{ display: 'flex' }}>
-            <Typography variant="body2">${item.price.toFixed(2)}</Typography>
-            <Typography sx={{ flex: 1 }}></Typography>
-            {quantity > 0 &&
-              <Typography variant="body2">${(item.price * quantity).toFixed(2)}</Typography>
-            }
-          </Box>
-        </CardContent>
-        <CardActions disableSpacing>
-          <Typography sx={{ flex: 1 }}></Typography>
-          {quantity > 0 &&
-            <IconButton onClick={() => onQuantityChange(-1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
-          }
-          {quantity > 0 &&
-            <Typography fontWeight="medium" mx={1}>{quantity}</Typography>
-          }
-          <IconButton onClick={() => onQuantityChange(1)} sx={{ ml: 0 }}><AddIcon /></IconButton>
-        </CardActions>
-      </Card>
-    </Grid>
-  );
-}
-
 function Cart(props) {
   const [open, setOpen] = useState(false);
 
@@ -176,15 +108,39 @@ function Cart(props) {
 }
 
 function CartPage(props) {
+  const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
+
+  async function submit() {
+    if (submitted) {
+      return;
+    }
+
+    setSubmitted(true);
+
+    const response = await fetch(`${apiRoot}/order/${props.store.storeId}`, {
+      method: 'post',
+      body: JSON.stringify({ order: { items: props.cart } }),
+    });
+
+    const js = await response.json();
+
+    if (js.orderId) {
+      router.push(`${apiRoot}/order/${props.store.storeId}/${js.orderId}`);
+    } else {
+      setSubmitted(false);
+    }
+  }
+
   const categoriesInCart = props.store.categories
-    .map(category => ({ ...category, items: category.items.filter(item => props.cart.hasOwnProperty(item.id)) }))
+    .map(category => ({ ...category, items: category.items.filter(item => props.cart.hasOwnProperty(item.itemId)) }))
     .filter(category => category.items.length > 0);
 
   const categories = categoriesInCart.map(category =>
     <Category key={category.name} category={category} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={false} />
   );
 
-  const totalPrice = categoriesInCart.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.id], 0), 0);
+  const totalPrice = categoriesInCart.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.itemId], 0), 0);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -196,9 +152,7 @@ function CartPage(props) {
           <IconButton edge="start" color="inherit" onClick={props.onClose}><CloseIcon /></IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
           </Typography>
-          <Button autoFocus color="inherit" onClick={props.onClose}>
-            Submit
-          </Button>
+          <Button autoFocus color="inherit" disabled={submitted} onClick={() => submit()}>Submit</Button>
         </Toolbar>
       </AppBar>
       <DialogContent>
