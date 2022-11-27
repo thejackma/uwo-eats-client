@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -24,6 +25,8 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 
+import _ from 'lodash';
+
 import { apiRoot } from '../../../config';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
@@ -37,6 +40,10 @@ export default function Store() {
   if (!data) return <div>Loading...</div>
 
   const store = data.store;
+
+  _(store.items).each((item, id) => item.id = id);
+
+  store.categories = groupItemsByCategory(store.items);
 
   function onQuantityChange(itemId, delta) {
     const newCart = {
@@ -72,10 +79,18 @@ export default function Store() {
   );
 }
 
+function groupItemsByCategory(items) {
+  return _(items)
+    .groupBy(it => it.category)
+    .entries()
+    .map(([name, items]) => ({ name, items }))
+    .value();
+}
+
 function Category(props) {
   const category = props.category;
 
-  const items = props.category.items.map(item =>
+  const items = category.items.map(item =>
     <Item key={item.name} item={item} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={props.grid} />
   );
 
