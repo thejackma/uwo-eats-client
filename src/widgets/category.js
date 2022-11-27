@@ -7,7 +7,7 @@ export default function Category(props) {
   const category = props.category;
 
   const items = category.items.map(item =>
-    <Item key={item.name} item={item} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={props.grid} />
+    <Item key={item.id} item={item} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={props.grid} />
   );
 
   return (
@@ -18,4 +18,12 @@ export default function Category(props) {
       </Grid>
     </div>
   );
+}
+
+export function groupItemsByCategory(items) {
+  return _(items)
+    .groupBy(it => it.category)
+    .entries()
+    .map(([name, items]) => ({ name, items }))
+    .value();
 }

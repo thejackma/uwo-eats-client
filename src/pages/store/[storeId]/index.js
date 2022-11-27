@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -21,7 +21,7 @@ import { useTheme } from '@mui/material/styles';
 import _ from 'lodash';
 
 import { apiRoot } from '../../../config';
-import Category from '../../../widgets/category';
+import Category, { groupItemsByCategory } from '../../../widgets/category';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
@@ -73,14 +73,6 @@ export default function Store() {
   );
 }
 
-function groupItemsByCategory(items) {
-  return _(items)
-    .groupBy(it => it.category)
-    .entries()
-    .map(([name, items]) => ({ name, items }))
-    .value();
-}
-
 function Cart(props) {
   const [open, setOpen] = useState(false);
 
@@ -108,6 +100,7 @@ function Cart(props) {
 }
 
 function CartPage(props) {
+  console.log(props.cart);
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
 
@@ -126,21 +119,21 @@ function CartPage(props) {
     const js = await response.json();
 
     if (js.orderId) {
-      router.push(`${apiRoot}/order/${props.store.storeId}/${js.orderId}`);
+      router.push(`/order/${props.store.storeId}/${js.orderId}`);
     } else {
       setSubmitted(false);
     }
   }
 
-  const categoriesInCart = props.store.categories
+  const categories = props.store.categories
     .map(category => ({ ...category, items: category.items.filter(item => props.cart.hasOwnProperty(item.itemId)) }))
     .filter(category => category.items.length > 0);
 
-  const categories = categoriesInCart.map(category =>
+  const categoriesView = categories.map(category =>
     <Category key={category.name} category={category} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={false} />
   );
 
-  const totalPrice = categoriesInCart.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.itemId], 0), 0);
+  const totalPrice = categories.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.itemId], 0), 0);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -156,7 +149,7 @@ function CartPage(props) {
         </Toolbar>
       </AppBar>
       <DialogContent>
-        {categories}
+        {categoriesView}
         <Box sx={{ display: 'flex' }}>
           <Typography variant="h6" mb={2}>Total</Typography>
           <Typography sx={{ flex: 1 }}></Typography>

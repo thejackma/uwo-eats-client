@@ -4,35 +4,17 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
-import AddIcon from '@mui/icons-material/Add';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import Fab from '@mui/material/Fab';
-import Grid from '@mui/material/Unstable_Grid2';
-import IconButton from '@mui/material/IconButton';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 
 import _ from 'lodash';
 
 import { apiRoot } from '../../../../config';
-import { Category } from '../../../widgets/category';
+import Category, { groupItemsByCategory } from '../../../../widgets/category';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
-export default function Store() {
+export default function Order() {
   const router = useRouter();
   const { data, error } = useSWR(`${apiRoot}/order/${router.query.storeId}/${router.query.orderId}`, fetcher);
 
@@ -40,15 +22,35 @@ export default function Store() {
   if (!data) return <div>Loading...</div>
 
   const order = data.order;
+  const totalPrice = order.totalPrice;
+
+  const categories = groupItemsByCategory(order.items);
+
+  const categoriesView = categories.map(category =>
+    <Category key={category.name} category={category} grid={false} />
+  );
 
   return (
     <div>
       <Head>
+        <title>Order | {order.storeName} | UWO Eats</title>
         <meta name="description" content="Order your food with UWO Eats" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {order}
+
+      <main>
+        <Typography variant="h4" gutterBottom>Thanks for ordering!</Typography>
+        <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Here's your receipt for {order.storeName}.</Typography>
+
+        {categoriesView}
+
+        <Box sx={{ display: 'flex' }}>
+          <Typography variant="h6" mb={2}>Total</Typography>
+          <Typography sx={{ flex: 1 }}></Typography>
+          <Typography variant="h6">${totalPrice.toFixed(2)}</Typography>
+        </Box>
+      </main>
     </div>
   );
 }

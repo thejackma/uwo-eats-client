@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 
 export default function Item(props) {
   const item = props.item;
-  const quantity = props.cart[item.itemId] ?? 0;
+  const quantity = item.quantity ?? props.cart[item.itemId] ?? 0;
 
   function onQuantityChange(delta) {
     props.onQuantityChange(item.itemId, delta);
@@ -41,13 +41,15 @@ export default function Item(props) {
         </CardContent>
         <CardActions disableSpacing>
           <Typography sx={{ flex: 1 }}></Typography>
-          {quantity > 0 &&
+          {props.onQuantityChange && quantity > 0 &&
             <IconButton onClick={() => onQuantityChange(-1)}>{quantity > 1 ? <RemoveIcon /> : <DeleteIcon />}</IconButton>
           }
           {quantity > 0 &&
-            <Typography fontWeight="medium" mx={1}>{quantity}</Typography>
+            <Typography fontWeight="medium" mx={1} sx={{ py: 1 }}>{quantity}</Typography>
           }
-          <IconButton onClick={() => onQuantityChange(1)} sx={{ ml: 0 }}><AddIcon /></IconButton>
+          {props.onQuantityChange &&
+            <IconButton onClick={() => onQuantityChange(1)} sx={{ ml: 0 }}><AddIcon /></IconButton>
+          }
         </CardActions>
       </Card>
     </Grid>
