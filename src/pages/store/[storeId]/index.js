@@ -76,7 +76,7 @@ export default function Store() {
 function Cart(props) {
   const [open, setOpen] = useState(false);
 
-  const totalQuantity = Object.values(props.cart).reduce((sum, quantity) => sum + quantity, 0);
+  const totalQuantity = _(Object.values(props.cart)).sum();
 
   const onOpen = () => {
     setOpen(true);
@@ -100,7 +100,6 @@ function Cart(props) {
 }
 
 function CartPage(props) {
-  console.log(props.cart);
   const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
 
@@ -133,7 +132,7 @@ function CartPage(props) {
     <Category key={category.name} category={category} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={false} />
   );
 
-  const totalPrice = categories.reduce((categorySum, category) => categorySum + category.items.reduce((itemSum, item) => itemSum + item.price * props.cart[item.itemId], 0), 0);
+  const totalPrice = _(categories).sumBy(category => _(category.items).sumBy(item => item.price * props.cart[item.itemId]));
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -143,8 +142,7 @@ function CartPage(props) {
       <AppBar sx={{ position: 'relative' }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={props.onClose}><CloseIcon /></IconButton>
-          <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-          </Typography>
+          <Typography sx={{ ml: 2, flex: 1 }} variant="h6"></Typography>
           <Button autoFocus color="inherit" disabled={submitted} onClick={() => submit()}>Submit</Button>
         </Toolbar>
       </AppBar>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 
@@ -41,7 +42,7 @@ export default function Order() {
 
       <main>
         <Typography variant="h4" gutterBottom>Thanks for ordering!</Typography>
-        <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Here's your receipt for {order.storeName}.</Typography>
+        <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Here's your receipt for <Link href={`/store/${order.storeId}`}>{order.storeName}</Link>.</Typography>
 
         {categoriesView}
 
