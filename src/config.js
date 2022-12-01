@@ -1,1 +1,1 @@
-export const apiRoot = 'https://5zm0opo6u7.execute-api.ca-central-1.amazonaws.com';
+export const apiRoot = 'https://1wr5h65djh.execute-api.us-east-1.amazonaws.com';
