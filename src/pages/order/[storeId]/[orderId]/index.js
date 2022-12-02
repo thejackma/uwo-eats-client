@@ -15,6 +15,10 @@ import Category, { groupItemsByCategory } from '../../../../widgets/category';
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
+/*
+function for constructing order page output
+request order info (json data) from server, after obtain data, group items by category, render view
+*/
 export default function Order() {
   const router = useRouter();
   const { data, error } = useSWR(`${apiRoot}/order/${router.query.storeId}/${router.query.orderId}`, fetcher);
@@ -31,6 +35,7 @@ export default function Order() {
     <Category key={category.name} category={category} grid={false} />
   );
 
+  //print list of item details (from particular categories) and receipt with total price
   return (
     <div>
       <Head>
@@ -39,7 +44,7 @@ export default function Order() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-
+      
       <main>
         <Typography variant="h4" gutterBottom>Thanks for ordering!</Typography>
         <Typography variant="h5" gutterBottom sx={{ mb: 4 }}>Here's your receipt for <Link href={`/store/${order.storeId}`}>{order.storeName}</Link>.</Typography>

@@ -20,25 +20,30 @@ import { useTheme } from '@mui/material/styles';
 
 import _ from 'lodash';
 
-import { apiRoot } from '../../../config';
-import Category, { groupItemsByCategory } from '../../../widgets/category';
+import { apiRoot } from '../../../config'; //imported root from config file in src
+import Category, { groupItemsByCategory } from '../../../widgets/category'; //import category function
 
 const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
+/*
+content and functionalities of store page after click and enter /store/1
+*/
 export default function Store() {
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState({}); //state of what's in the cart
   const router = useRouter();
-  const { data, error } = useSWR(`${apiRoot}/store/${router.query.storeId}`, fetcher);
+  const { data, error } = useSWR(`${apiRoot}/store/${router.query.storeId}`, fetcher); //get data from server
 
   if (error) return <div>Failed to load</div>
   if (!data) return <div>Loading...</div>
 
-  const store = data.store;
+  const store = data.store; //get store data after successful loading
 
-  _(store.items).each((item, itemId) => item.itemId = itemId);
+  _(store.items).each((item, itemId) => item.itemId = itemId); //handle the received response by adding id to every item
 
-  store.categories = groupItemsByCategory(store.items);
+  store.categories = groupItemsByCategory(store.items); //group item by category 
 
+  //funciton for adjusting item quantity in shopping cart
+  //function is called when change item quantity by category and item file, get changes back to store file where each item reports changes to shopping cart
   function onQuantityChange(itemId, delta) {
     const newCart = {
       ...cart,
@@ -49,11 +54,13 @@ export default function Store() {
     }
     setCart(newCart);
   }
-
+  
+  //call category function and pass in key, category, cart params to show category content 
   const categories = store.categories.map(category =>
     <Category key={category.name} category={category} cart={cart} onQuantityChange={onQuantityChange} grid={true} />
-  );
+  ); 
 
+  //render the page of store; in order of title, description, store names, categories and cart at the bottom
   return (
     <div>
       <Head>
@@ -73,10 +80,11 @@ export default function Store() {
   );
 }
 
+//shopping cart state
 function Cart(props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); //open & close cart 
 
-  const totalQuantity = _(Object.values(props.cart)).sum();
+  const totalQuantity = _(Object.values(props.cart)).sum(); //calculate total quantity with input items in cart
 
   const onOpen = () => {
     setOpen(true);
@@ -86,6 +94,7 @@ function Cart(props) {
     setOpen(false);
   };
 
+  //show cart icon (floating action button) when ordered any quantity of item
   if (totalQuantity > 0) {
     return (
       <div>
@@ -101,8 +110,9 @@ function Cart(props) {
 
 function CartPage(props) {
   const router = useRouter();
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted, setSubmitted] = useState(false); 
 
+  //limit user's repeated order submit
   async function submit() {
     if (submitted) {
       return;
@@ -110,13 +120,15 @@ function CartPage(props) {
 
     setSubmitted(true);
 
+    //post shopping cart details to server 
     const response = await fetch(`${apiRoot}/order/${props.store.storeId}`, {
-      method: 'post',
+      method: 'post', //send post request
       body: JSON.stringify({ order: { items: props.cart } }),
-    });
+    }); //shopping cart
 
-    const js = await response.json();
-
+    const js = await response.json(); //get response (submit order id)
+    
+    //jump to order page using router   
     if (js.orderId) {
       router.push(`/order/${props.store.storeId}/${js.orderId}`);
     } else {
@@ -124,19 +136,23 @@ function CartPage(props) {
     }
   }
 
+  //filter and save only the selected items in shopping cart from categories to show
   const categories = props.store.categories
     .map(category => ({ ...category, items: category.items.filter(item => props.cart.hasOwnProperty(item.itemId)) }))
     .filter(category => category.items.length > 0);
-
+  
+  //render selected items only from categories (one item per row) 
   const categoriesView = categories.map(category =>
     <Category key={category.name} category={category} cart={props.cart} onQuantityChange={props.onQuantityChange} grid={false} />
   );
 
+  //calculate shopping cart total price of all items
   const totalPrice = _(categories).sumBy(category => _(category.items).sumBy(item => item.price * props.cart[item.itemId]));
 
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('md')); //get theme and decide the page is full screen or not, if so, pop-up cart page, otherwise takes over full screen
 
+  //Used MUI library for material design: cart, box, Grid, dialog, Appbar...
   return (
     <Dialog fullScreen={fullScreen} fullWidth={true} open={props.open} onClose={props.onClose}>
       <AppBar sx={{ position: 'relative' }}>

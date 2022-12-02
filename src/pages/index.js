@@ -7,10 +7,16 @@ import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 
-export default function Home() {
-  const router = useRouter();
 
-  return (
+export default function Home() {
+  const router = useRouter(); //webpage navigation
+
+  /*
+  content that webpage return: 
+  click on card to push to new page /store/1
+  push used to allow pop and go back to previous page in browser
+  */
+  return ( 
     <div>
       <Head>
         <title>UWO Eats</title>
